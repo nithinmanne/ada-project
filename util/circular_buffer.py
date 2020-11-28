@@ -23,5 +23,8 @@ class CircularBuffer(Sequence):
             self.buffer[self.offset] = value
             self.offset = (self.offset + 1) % len(self.buffer)
 
+    def mean(self):
+        return np.mean(self.buffer[:self.length], axis=0)
+
     def __len__(self):
         return self.length

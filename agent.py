@@ -34,7 +34,7 @@ class DQNAgent:
         self.rewards_history = CircularBuffer(MAX_MEMORY_LENGTH, (), dtype=np.float32)
         self.done_history = CircularBuffer(MAX_MEMORY_LENGTH, (), dtype=int)
 
-        self.episode_reward_history = []
+        self.episode_reward_history = CircularBuffer(40, (), dtype=int)
         self.epsilon = EPSILON_MAX
 
     def _action(self, state):
@@ -81,6 +81,7 @@ class DQNAgent:
         for _ in range(num_episodes):
             state = self.env.reset()
             episode_reward = 0
+            episode_loss = 0.
 
             for _ in range(MAX_EPISODE_STEPS):
                 step += 1
@@ -88,7 +89,7 @@ class DQNAgent:
                 episode_reward += reward
 
                 if step % LEARN_STEP_COUNT == 0 and step > BATCH_SIZE:
-                    loss = self._learn()
+                    episode_loss += self._learn()
                 if step % MODEL_UPDATE_STEP_COUNT == 0 and step > BATCH_SIZE:
                     self.target_model.set_weights(self.model.get_weights())
 
@@ -96,11 +97,8 @@ class DQNAgent:
                     break
 
             self.episode_reward_history.append(episode_reward)
-            length = len(self.episode_reward_history)
-            if length > 100:
-                self.episode_reward_history = self.episode_reward_history[length - 100:]
-            # self.play()
-            print(f'Reward: {episode_reward}, Mean: {np.mean(self.episode_reward_history)}, Step: {step}')
+            print(f'Reward: {episode_reward}, Mean: {self.episode_reward_history.mean()},\
+Step: {step}, Loss: {episode_loss}')
 
     def play(self):
         state = self.env.reset()
