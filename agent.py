@@ -7,9 +7,6 @@ from util.circular_buffer import CircularBuffer
 from config import *
 
 
-
-
-
 class DQNAgent:
     def __init__(self):
         self.env = gym.wrappers.FrameStack(
