@@ -2,7 +2,7 @@ import numpy as np
 import gym
 import tensorflow as tf
 
-from model import DQNModel
+from model import create_dqn_model
 from util.circular_buffer import CircularBuffer
 from config import *
 
@@ -20,10 +20,9 @@ class DQNAgent:
         self.observation_shape = self.env.observation_space.shape
         self.observation_dtype = self.env.observation_space.dtype
 
-        self.model = DQNModel(num_actions=self.action_space.n)
+        self.model = create_dqn_model(num_actions=self.action_space.n)
         self.model.compile(OPTIMIZER, LOSS_FUNCTION)
-        self.target_model = DQNModel(num_actions=self.action_space.n)
-        # self.target_model.compile(OPTIMIZER, LOSS_FUNCTION)
+        self.target_model = create_dqn_model(num_actions=self.action_space.n)
         self.dqn = DQN
 
         self.action_history = CircularBuffer(MAX_MEMORY_LENGTH, (), dtype=np.int8)

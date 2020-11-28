@@ -9,8 +9,11 @@ if len(gpus) > 0:
 
 
 if __name__ == '__main__':
-    total_steps = 100000
+    total_steps = 10
     if len(sys.argv) == 2:
         total_steps = int(sys.argv[1])
     a = agent.DQNAgent()
     a.train(total_steps)
+    a.model.save('model.h5')
+    a.target_model.save('target_model.h5')
+
