@@ -1,0 +1,20 @@
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import Huber
+
+
+ENVIRONMENT = 'BreakoutNoFrameskip-v4'
+
+GAMMA = 0.99
+EPSILON_MIN = 0.1
+EPSILON_MAX = 1.1
+EPSILON_DECREMENT_FRAMES = 1_000_000
+EPSILON_DECREMENT = (EPSILON_MAX - EPSILON_MIN) / EPSILON_DECREMENT_FRAMES
+BATCH_SIZE = 32
+MAX_EPISODE_STEPS = 10_000
+MAX_MEMORY_LENGTH = 10_000
+LEARN_STEP_COUNT = 4
+MODEL_UPDATE_STEP_COUNT = 1000
+
+DQN = True
+OPTIMIZER = Adam(learning_rate=0.00025, clipnorm=1.0)
+LOSS_FUNCTION = Huber()
