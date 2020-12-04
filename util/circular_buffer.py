@@ -1,9 +1,12 @@
+"""This is my implementation of a very fast Circular Buffer in Python using Numpy.
+   I used the Sequence abstract class which just needs the length and get."""
 from collections.abc import Sequence
 
 import numpy as np
 
 
 class CircularBuffer(Sequence):
+    """This is the circular buffer, its backed by a fixed size Numpy array."""
     def __init__(self, max_len, shape, **kwargs):
         self.buffer = np.empty((max_len, *shape), **kwargs)
         self.length = 0
@@ -11,6 +14,7 @@ class CircularBuffer(Sequence):
         self.offset = 0
 
     def __getitem__(self, indices):
+        """Use Numpy slicing to get the sample concisely"""
         assert np.max(indices) < self.length
         return self.buffer[(indices + self.offset) % len(self.buffer)]
 
