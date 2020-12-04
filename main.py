@@ -1,5 +1,8 @@
 import sys
+
+
 import agent
+
 
 # Windows CUDA Issue on my Laptop
 import tensorflow as tf
@@ -9,11 +12,10 @@ if len(gpus) > 0:
 
 
 if __name__ == '__main__':
-    total_steps = 10
+    total_steps = 1000
     if len(sys.argv) == 2:
         total_steps = int(sys.argv[1])
     a = agent.DQNAgent()
     a.train(total_steps)
     a.model.save('model.h5')
     a.target_model.save('target_model.h5')
-

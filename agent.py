@@ -23,7 +23,6 @@ class DQNAgent:
         self.model = create_dqn_model(num_actions=self.action_space.n)
         self.model.compile(OPTIMIZER, LOSS_FUNCTION)
         self.target_model = create_dqn_model(num_actions=self.action_space.n)
-        self.dqn = DQN
 
         self.action_history = CircularBuffer(MAX_MEMORY_LENGTH, (), dtype=np.int8)
         self.state_history = CircularBuffer(MAX_MEMORY_LENGTH, self.observation_shape,
@@ -64,14 +63,14 @@ class DQNAgent:
 
         q_old = self.target_model.predict_on_batch(state_next_sample)
         batch_index = np.arange(BATCH_SIZE)
-        if self.dqn:
+        if DQN:
             q_eval = self.model.predict_on_batch(state_next_sample)
             max_actions = tf.argmax(q_eval, axis=1)
             selected_q_old = q_old[batch_index, max_actions]
         else:
             selected_q_old = np.max(q_old, axis=1)
 
-        q_target = self.model.predict_on_batch(state_sample).copy()
+        q_target = self.model.predict_on_batch(state_sample)
         q_target[batch_index, action_sample] = rewards_sample + (1 - done_sample) * GAMMA * selected_q_old
         return self.model.train_on_batch(state_sample, q_target)
 
@@ -79,24 +78,28 @@ class DQNAgent:
         step = 0
         for _ in range(num_episodes):
             state = self.env.reset()
+            if RENDER:
+                self.env.render()
             episode_reward = 0
             episode_loss = 0.
 
             for _ in range(MAX_EPISODE_STEPS):
                 step += 1
                 state, reward, done = self._action(state)
+                if RENDER:
+                    self.env.render()
                 episode_reward += reward
 
-                if step % LEARN_STEP_COUNT == 0 and step > BATCH_SIZE:
-                    episode_loss += self._learn()
                 if step % MODEL_UPDATE_STEP_COUNT == 0 and step > BATCH_SIZE:
+                    episode_loss += self._learn()
+                if step % TARGET_MODEL_UPDATE_STEP_COUNT == 0 and step > BATCH_SIZE:
                     self.target_model.set_weights(self.model.get_weights())
 
                 if done:
                     break
 
             self.episode_reward_history.append(episode_reward)
-            print(f'Reward: {episode_reward}, Mean: {self.episode_reward_history.mean()},\
+            print(f'Reward: {episode_reward}, Mean: {self.episode_reward_history.mean()}, \
 Step: {step}, Loss: {episode_loss}')
 
     def play(self):
@@ -104,10 +107,13 @@ Step: {step}, Loss: {episode_loss}')
         self.env.render()
         episode_reward = 0
         for _ in range(MAX_EPISODE_STEPS):
-            state_tensor = tf.convert_to_tensor(state)
-            state_tensor = tf.expand_dims(state_tensor, 0)
-            action_probs = self.model(state_tensor, training=False)
-            action = tf.argmax(action_probs[0]).numpy()
+            if EPSILON_MIN > np.random.uniform():
+                action = self.action_space.sample()
+            else:
+                state_tensor = tf.convert_to_tensor(state)
+                state_tensor = tf.expand_dims(state_tensor, 0)
+                action_probs = self.model(state_tensor, training=False)
+                action = tf.argmax(action_probs[0]).numpy()
             state, reward, done, _ = self.env.step(action)
             episode_reward += reward
             self.env.render()

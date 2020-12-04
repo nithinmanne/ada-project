@@ -1,3 +1,4 @@
 tensorflow
-gym
+gym[atari]
 numpy
+ray[rllib]
