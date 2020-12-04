@@ -1,3 +1,6 @@
+"""This is just a sample main file to call the non-distributed
+   implementation of the agent, the agent is very easy to create
+   and train without any config needed."""
 import sys
 
 

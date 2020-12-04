@@ -1,3 +1,5 @@
+"""This is the main convolutional neural network that's used by the agent
+   both in RLlib and the non-distributed variant."""
 import tensorflow as tf
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Flatten, Permute, Input
@@ -7,6 +9,8 @@ from ray.rllib.models.tf.tf_modelv2 import TFModelV2
 
 
 def create_dqn_model(num_actions):
+    """Just creates the model and returns it, and is used by the agent to
+       create the prediction and target networks."""
     return Sequential([
         Permute((2, 3, 1)),
         Conv2D(32, 8, strides=4, activation=relu),
@@ -20,6 +24,8 @@ def create_dqn_model(num_actions):
 
 
 class DQNRLlibModel(TFModelV2):
+    """This is the same model as above for RLlib. It requires the class to implement
+       some API which is needed for RLlib to generate the graph."""
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
         super().__init__(obs_space, action_space, num_outputs, model_config, name)
         inputs = Input(obs_space.shape)

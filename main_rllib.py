@@ -1,3 +1,8 @@
+"""This is just a sample main file to call the distributed
+   implementation of the agent, the agent is very easy to create
+   and train without any config needed. The agent can also be
+   called using the Ray CLI as all the configuration is correctly
+   defined in the default config."""
 import sys
 import ray
 
