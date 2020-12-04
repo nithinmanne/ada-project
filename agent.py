@@ -1,21 +1,15 @@
 import numpy as np
 import gym
-import tensorflow as tf
 
 from model import create_dqn_model
 from util.circular_buffer import CircularBuffer
+from util.environment import MainPreprocessing, FrameStack
 from config import *
 
 
 class DQNAgent:
     def __init__(self):
-        self.env = gym.wrappers.FrameStack(
-                        gym.wrappers.AtariPreprocessing(
-                            gym.make(ENVIRONMENT),
-                            scale_obs=True
-                        ),
-                        num_stack=4
-        )
+        self.env = FrameStack(MainPreprocessing(gym.make(ENVIRONMENT)))
         self.action_space = self.env.action_space
         self.observation_shape = self.env.observation_space.shape
         self.observation_dtype = self.env.observation_space.dtype

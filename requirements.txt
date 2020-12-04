@@ -2,3 +2,4 @@ tensorflow
 gym[atari]
 numpy
 ray[rllib]
+cv2
